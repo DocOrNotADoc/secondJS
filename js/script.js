@@ -1,26 +1,6 @@
-
-// Возьмите свой код из предыдущей практики
-/* Задания на урок:
-
-1) Реализовать функционал, что после заполнения формы и нажатия кнопки "Подтвердить" - 
-новый фильм добавляется в список. Страница не должна перезагружаться.
-Новый фильм должен добавляться в movieDB.movies.
-Для получения доступа к значению input - обращаемся к нему как input.value;
-P.S. Здесь есть несколько вариантов решения задачи, принимается любой, но рабочий.
-
-2) Если название фильма больше, чем 21 символ - обрезать его и добавить три точки
-
-3) При клике на мусорную корзину - элемент будет удаляться из списка (сложно)
-
-4) Если в форме стоит галочка "Сделать любимым" - в консоль вывести сообщение: 
-"Добавляем любимый фильм"
-
-5) Фильмы должны быть отсортированы по алфавиту */
-
 'use strict';
-// Все предыдущие комменты удалены. Код отрефакторен,- переменные наверху.
-// делаем, чтобы наш скрипт сработал тогда, когда дом-дерево уже загоружено, но не весь контет. Картинки и стили ждать не надо. Оборачиваем всё.
-document.addEventListener('DOMContentLoaded', () => { // есть вариант window.addEventListener.......
+
+document.addEventListener('DOMContentLoaded', () => {
 
     const movieDB = {
         movies: [
@@ -43,7 +23,6 @@ document.addEventListener('DOMContentLoaded', () => { // есть вариант
 
     addForm.addEventListener('submit', (event) => {
         event.preventDefault();
-        // чтобы страница не обновлялась при добавлении инпута
 
         let newFilm = addInput.value;
         const favorite = checkBox.checked;
@@ -64,7 +43,6 @@ document.addEventListener('DOMContentLoaded', () => { // есть вариант
             createMovieList(movieDB.movies, movieList);
         }
 
-        // addForm.reset();
         event.target.reset();
     });
 
@@ -76,7 +54,6 @@ document.addEventListener('DOMContentLoaded', () => { // есть вариант
     };
     
 
-    // пока что, можно не переделывать с аргументами
     const makeChanges = () => { 
         genre.textContent = 'драма';
     
@@ -106,9 +83,6 @@ document.addEventListener('DOMContentLoaded', () => { // есть вариант
                 btn.parentElement.remove();
                 movieDB.movies.splice(i, 1);
 
-                // рекурсия - когда функция использует сама себя внутри.
-                // в нашем случае, это нужно, чтобы при удалении элементов обновлялась нумерация
-                // createMovieList(movieDB.movies, movieList);
                 createMovieList(films, parent);
             });
         });
@@ -116,7 +90,6 @@ document.addEventListener('DOMContentLoaded', () => { // есть вариант
 
     deleteAds(ads);
     makeChanges();
-    // sortArr(movieDB.movies);
     createMovieList(movieDB.movies, movieList);
 });
 
