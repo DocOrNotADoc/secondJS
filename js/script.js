@@ -1,81 +1,122 @@
-// В КАЖДОМ СЛЕДУЮЩЕМ УРОКЕ БУДУ УДАЛЯТЬ КОММЕНТЫ И ЗАПАСНЫЕ ВАРИАНТЫ, А ТАКЖЕ НЕМНОГО ПЕРЕНОСИТЬ, НАПРИМЕР, ПЕРЕМЕННЫЕ ВВЕРХ
+
+// Возьмите свой код из предыдущей практики
 /* Задания на урок:
 
-1) Удалить все рекламные блоки со страницы (правая часть сайта)
+1) Реализовать функционал, что после заполнения формы и нажатия кнопки "Подтвердить" - 
+новый фильм добавляется в список. Страница не должна перезагружаться.
+Новый фильм должен добавляться в movieDB.movies.
+Для получения доступа к значению input - обращаемся к нему как input.value;
+P.S. Здесь есть несколько вариантов решения задачи, принимается любой, но рабочий.
 
-2) Изменить жанр фильма, поменять "комедия" на "драма"
+2) Если название фильма больше, чем 21 символ - обрезать его и добавить три точки
 
-3) Изменить задний фон постера с фильмом на изображение "bg.jpg". Оно лежит в папке img.
-Реализовать только при помощи JS
+3) При клике на мусорную корзину - элемент будет удаляться из списка (сложно)
 
-4) Список фильмов на странице сформировать на основании данных из этого JS файла.
-Отсортировать их по алфавиту 
+4) Если в форме стоит галочка "Сделать любимым" - в консоль вывести сообщение: 
+"Добавляем любимый фильм"
 
-5) Добавить нумерацию выведенных фильмов */
+5) Фильмы должны быть отсортированы по алфавиту */
 
 'use strict';
+// Все предыдущие комменты удалены. Код отрефакторен,- переменные наверху.
+// делаем, чтобы наш скрипт сработал тогда, когда дом-дерево уже загоружено, но не весь контет. Картинки и стили ждать не надо. Оборачиваем всё.
+document.addEventListener('DOMContentLoaded', () => { // есть вариант window.addEventListener.......
 
-const movieDB = {
-    movies: [
-        "Логан",
-        "Лига справедливости",
-        "Ла-ла лэнд",
-        "Одержимость",
-        "Скотт Пилигрим против..."
-    ]
-};
+    const movieDB = {
+        movies: [
+            "Логан",
+            "Лига справедливости",
+            "Ла-ла лэнд",
+            "Одержимость",
+            "Скотт Пилигрим против..."
+        ]
+    };
 
-//1
-const ads = document.querySelector('.promo__adv');
-ads.remove();
-
-// ВАРИАНТ ИВАНА - ПОЛУЧАЕМ ВСЕ ПРОМО_АДВ. РАЗНИЦА БУДЕТ, КОГДА РЕКЛАМНЫХ БЛОКОВ НЕСКОЛЬКО. ПОКА ОСТАВЛЮ СВОЙ ВАРИАНТ
-// const advs = document.querySelectorAll('.promo__adv');
-// advs.forEach(item => {
-//     item.remove();
-// });
-
-// или обычная функция
-// const advs = document.querySelectorAll('.promo__adv');
-// advs.forEach(function (item){
-//     item.remove();
-// });
-
-//2 // я поменял не текст, но весь элемент. Оставлю вариант Ивана, в котором меняется именно текст.
-// const failGenre = document.querySelector('.promo__genre');
-// const currentGenre = document.createElement('div');
-// currentGenre.innerHTML = "<div class='promo__genre'>ДРАМА</div>";
-// failGenre.replaceWith(currentGenre);
-
-// вар. Ивана - 2 и 3 сразу
-    const poster = document.querySelector('.promo__bg'),
-        genre = poster.querySelector('.promo__genre');
-
-    genre.textContent = 'драма'; // однако, так тоже можно! норм!
+    const ads = document.querySelectorAll('.promo__adv div, img'),
+        poster = document.querySelector('.promo__bg'),
+        genre = poster.querySelector('.promo__genre'),
+        movieList = document.querySelector('.promo__interactive-list'),
+        addForm = document.querySelector('form.add'),
+        addInput = addForm.querySelector('.adding__input'),
+        checkBox = addForm.querySelector('[type="checkbox"]');
 
 
+    addForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+        // чтобы страница не обновлялась при добавлении инпута
 
-//3
-poster.style.backgroundImage = 'url("../img/bg.jpg")';
+        let newFilm = addInput.value;
+        const favorite = checkBox.checked;
+
+        if (newFilm) {
+
+            if (newFilm.length > 21) {
+                newFilm = `${newFilm.substring(0, 22)}...`;
+            }
+
+            if (favorite) {
+                console.log("Добавляем любимый фильм");
+            }
+
+            movieDB.movies.push(newFilm);
+            sortArr(movieDB.movies);
+
+            createMovieList(movieDB.movies, movieList);
+        }
+
+        // addForm.reset();
+        event.target.reset();
+    });
 
 
-//4,5 // Всё-таки, Иван решил не менять отолько текст, но изменить элемент. Ок, сделаю так же
-const movieList = document.querySelector('.promo__interactive-list');
+    const deleteAds = (arr) => {
+        arr.forEach(item => {
+            item.remove();
+        });
+    };
+    
 
-movieList.innerHTML = ''; // чистим список из HTML-ки
+    // пока что, можно не переделывать с аргументами
+    const makeChanges = () => { 
+        genre.textContent = 'драма';
+    
+        poster.style.backgroundImage = 'url("../img/bg.jpg")';
+    };  
 
-movieDB.movies.sort(); // сортируем список
 
-//console.log(poster.innerHTML); // через innerHTML можно получить все элементы с вёрсткой в виде одной большой строки
+    const sortArr = (arr) => {
+        arr.sort();
+    };
+    
 
+    function createMovieList(films, parent) {
+        parent.innerHTML = '';
+        sortArr(films);
+        
+        films.forEach((film, i) => {
+            parent.innerHTML += `
+                <li class="promo__interactive-item">${i + 1} ${film}
+                    <div class="delete"></div>
+                </li>
+            `;
+        });
 
-movieDB.movies.forEach((film, i) => {
-    // a = a + 1; a = a + "aaa";
-    // a += 1; a += "aaa"//same
-    // если не поставить плюс, то каждый цикл будет замещять вывод предыдущего
-    movieList.innerHTML += `
-        <li class="promo__interactive-item">${i + 1} ${film}
-            <div class="delete"></div>
-        </li>
-    `;
+        document.querySelectorAll('.delete').forEach((btn, i) => {
+            btn.addEventListener('click', () => {
+                btn.parentElement.remove();
+                movieDB.movies.splice(i, 1);
+
+                // рекурсия - когда функция использует сама себя внутри.
+                // в нашем случае, это нужно, чтобы при удалении элементов обновлялась нумерация
+                // createMovieList(movieDB.movies, movieList);
+                createMovieList(films, parent);
+            });
+        });
+    }
+
+    deleteAds(ads);
+    makeChanges();
+    // sortArr(movieDB.movies);
+    createMovieList(movieDB.movies, movieList);
 });
+
